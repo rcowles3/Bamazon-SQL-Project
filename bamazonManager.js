@@ -80,19 +80,56 @@ var lowInventory = function() {
             console.log("\nEverything is sufficiently stocked.");
         } else {
 
-        	console.log("\nWe are running low on these specific vehicles, an order for a new shipment should be placed.");
+            console.log("\nWe are running low on these specific vehicles, an order for a new shipment should be placed.");
 
-        	// for loop to run through low inventory
-        	for(var i = 0; i < res.length; i++){
+            // for loop to run through low inventory
+            for (var i = 0; i < res.length; i++) {
 
-            console.log("\nItem ID: ", res[i].ITEM_ID, "\nVehicle Name: ", res[i].PRODUCT_NAME, "\nIn Stock: ", res[i].STOCK_QUANITY, "\n------------------------------");
-        	}
+                console.log("\nItem ID: ", res[i].ITEM_ID, "\nVehicle Name: ", res[i].PRODUCT_NAME, "\nIn Stock: ", res[i].STOCK_QUANITY, "\n------------------------------");
+            }
         }
     })
 
     // quit application
     terminateConnection();
+}
 
+// function to update inventory
+var updateInventory = function() {
+
+    // prompt to ask manager what to update
+    inquirer.prompt([{
+        name: "updateID",
+        message: "For which ITEM_ID would you like to update inventory for? 1-20",
+        type: "input",
+    }, {
+        name: "updateQuantity",
+        message: "How much inventory would you like to add for the ITEM_ID.",
+        type: "input"
+
+    }]).then(function(updateItemId) {
+
+        // var to hold our sql query
+        let sqlQuery = "UPDATE PRODUCTS SET STOCK_QUANITY = STOCK_QUANITY + ? WHERE ITEM_ID = ?";
+
+        // query our sql database
+        connection.query(sqlQuery, [updateItemId.updateQuantity, updateItemId.updateID], function(err, res) {
+
+        	// err catcher
+        	if(err) throw err;
+
+        	// update verification
+        	console.log("Item ID: ", updateItemId.updateID, " has successfuly been updated by ", updateItemId.updateQuantity,".");
+        })
+
+        // quit application
+        terminateConnection();
+    })
+}
+
+// function to add new products 
+var addProduct = function() {
+	
 }
 
 // FUNCTION TO RUN APP
@@ -117,15 +154,15 @@ var promptManager = function() {
             case 'View Low Inventory.':
                 lowInventory();
                 break;
-                // case 'Find top songs within a specific range position, 1-5000.':
-                //     searchRange();
-                //     break;
-                // case 'Search for a specific song.':
-                //     searchSong();
-                //     break;
-                case 'Quit Application.':
-                    terminateConnection();
-                    break;
+            case 'Add to Inventory.':
+                updateInventory();
+                break;
+            case 'Add New Product.':
+                addProduct();
+                break;
+            case 'Quit Application.':
+                terminateConnection();
+                break;
         }
     })
 }
