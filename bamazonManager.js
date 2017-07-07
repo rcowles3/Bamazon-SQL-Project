@@ -115,11 +115,11 @@ var updateInventory = function() {
         // query our sql database
         connection.query(sqlQuery, [updateItemId.updateQuantity, updateItemId.updateID], function(err, res) {
 
-        	// err catcher
-        	if(err) throw err;
+            // err catcher
+            if (err) throw err;
 
-        	// update verification
-        	console.log("Item ID: ", updateItemId.updateID, " has successfuly been updated by ", updateItemId.updateQuantity,".");
+            // update verification
+            console.log("\nItem ID: ", updateItemId.updateID, " has successfuly been updated by ", updateItemId.updateQuantity, ".");
         })
 
         // quit application
@@ -129,7 +129,80 @@ var updateInventory = function() {
 
 // function to add new products 
 var addProduct = function() {
-	
+
+    // prompt to ask manager what product to add
+    inquirer.prompt([{
+        name: "addItemId",
+        message: "Please enter an ITEM_ID, PRODUCT_NAME, DEPARTMENT_NAME, PRICE, and STOCK_QUANTITY for the product that you would like to add.\n  ITEM_ID: ",
+        type: "input",
+    }, {
+        name: "addProductName",
+        message: "PRODUCT_NAME: ",
+        type: "input",
+    }, {
+        name: "addDepartmentName",
+        message: "DEPARTMENT_NAME: ",
+        type: "input",
+    }, {
+        name: "addPrice",
+        message: "PRICE: ",
+        type: "input",
+    }, {
+        name: "addStockQuantity",
+        message: "STOCK_QUANTITY: ",
+        type: "input"
+
+    }]).then(function(addedProduct) {
+
+        console.log("\nHere is the product data you wish to add: \nITEM_ID: ",
+            addedProduct.addItemId,
+            "\nPRODUCT_NAME: ",
+            addedProduct.addProductName,
+            "\nDEPARTMENT_NAME: ",
+            addedProduct.addDepartmentName,
+            "\nPRICE: $",
+            addedProduct.addPrice,
+            "\nSTOCK_QUANTITY: ",
+            addedProduct.addStockQuantity, "\n");
+
+        // prompt to confirm data
+        inquirer.prompt([{
+            name: "dataConfirm",
+            message: "Are you sure you want to add this data?",
+            type: "confirm"
+
+        }]).then(function(confirmation) {
+
+            // if else to either re-enter data or quick application
+            if (confirmation.dataConfirm) {
+
+                // run sql query
+                connection.query('INSERT INTO PRODUCTS SET ?', {
+                        ITEM_ID: addedProduct.addItemId,
+                        PRODUCT_NAME: addedProduct.addProductName,
+                        DEPARTMENT_NAME: addedProduct.addDepartmentName,
+                        PRICE: addedProduct.addPrice,
+                        STOCK_QUANITY: addedProduct.addStockQuantity
+                    },
+                    function(err, results) {
+
+                        // err catcher
+                        if (err) throw err;
+
+                        // success message
+                        console.log("\nYour data input has successfuly been updated in our database for ITEM_ID", addedProduct.addItemId);
+                    })
+
+                // quit application
+                terminateConnection();
+
+            } else {
+
+                // prompt to re-add product info
+                addProduct();
+            }
+        })
+    })
 }
 
 // FUNCTION TO RUN APP
