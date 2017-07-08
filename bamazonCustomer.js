@@ -52,7 +52,7 @@ var displayProducts = function() {
         console.log("-------------------------------------------------------------------------\n");
 
         // for loop to run through our data array
-        for (var i = 0; i < res.length; i++) {
+        for (let i = 0; i < res.length; i++) {
 
             // render data to log
             console.log("ID:", res[i].ITEM_ID, "\nCAR:", res[i].PRODUCT_NAME, "\nPRICE: $", res[i].PRICE);

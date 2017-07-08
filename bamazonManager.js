@@ -52,7 +52,7 @@ var veiwProducts = function() {
         console.log("-------------------------------------------------------------------------\n");
 
         // for loop to run through our data array
-        for (var i = 0; i < res.length; i++) {
+        for (let i = 0; i < res.length; i++) {
 
             // render data to log
             console.log("ID:", res[i].ITEM_ID, "\nCAR:", res[i].PRODUCT_NAME, "\nPRICE: $", res[i].PRICE);
@@ -83,7 +83,7 @@ var lowInventory = function() {
             console.log("\nWe are running low on these specific vehicles, an order for a new shipment should be placed.");
 
             // for loop to run through low inventory
-            for (var i = 0; i < res.length; i++) {
+            for (let i = 0; i < res.length; i++) {
 
                 console.log("\nItem ID: ", res[i].ITEM_ID, "\nVehicle Name: ", res[i].PRODUCT_NAME, "\nIn Stock: ", res[i].STOCK_QUANITY, "\n------------------------------");
             }
