@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
     host: 'localhost', // update with host
     port: 3306, // update with port
     user: 'root', // update with user id
-    password: 'Fdd4e!i$f$', // update with user password
+    password: '', // update with user password
     database: 'BAMAZON' // update with created database
 });
 

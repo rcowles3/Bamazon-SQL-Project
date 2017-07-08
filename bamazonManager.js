@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
     host: 'localhost', // update with host
     port: 3306, // update with port
     user: 'root', // update with user id
-    password: 'Fdd4e!i$f$', // update with user password
+    password: '', // update with user password
     database: 'BAMAZON' // update with created database
 });
 
@@ -211,7 +211,7 @@ var addProduct = function() {
 // function to prompt manager 
 var promptManager = function() {
 
-    // \Run function to prompt for what user wants to do
+    // Run function to prompt for what user wants to do
     inquirer.prompt([{
         name: "managerMenu",
         message: "\nWhat would you like to do?\n",
