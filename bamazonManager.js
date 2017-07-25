@@ -3,17 +3,19 @@
 // DECLARING VARIABLES TO USE FOR NODE PACKAGES
 // ===============================================================
 
-var mysql = require('mysql');
-var inquirer = require('inquirer');
+const mysql = require('mysql');
+const inquirer = require('inquirer');
+const env = require('dotenv').config();
+
 
 // CONNECTING TO SQL DB
 // ===============================================================
 
-var connection = mysql.createConnection({
-    host: 'localhost', // update with host
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST, // update with host
     port: 3306, // update with port
-    user: 'root', // update with user id
-    password: '', // update with user password
+    user: process.env.DB_USER, // update with user id
+    password: process.env.DB_PASS, // update with user password
     database: 'BAMAZON' // update with created database
 });
 

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/rcowles3/Bamazon-SQL-Project#readme",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "inquirer": "^3.1.1",
     "mysql": "^2.13.0"
   }

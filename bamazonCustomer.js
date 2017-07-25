@@ -3,33 +3,37 @@
 // DECLARING VARIABLES TO USE FOR NODE PACKAGES
 // ===============================================================
 
-var mysql = require('mysql');
-var inquirer = require('inquirer');
+const mysql = require('mysql');
+const inquirer = require('inquirer');
+const env = require('dotenv').config();
+
 
 // CONNECTING TO SQL DB
 // ===============================================================
 
 var connection = mysql.createConnection({
-    host: 'localhost', // update with host
+    host: process.env.DB_HOST, // update with host
     port: 3306, // update with port
-    user: 'root', // update with user id
-    password: '', // update with user password
+    user: process.env.DB_USER, // update with user id
+    password: process.env.DB_PASS, // update with user password
     database: 'BAMAZON' // update with created database
 });
 
 // connecting to db, and displaying connection id
-connection.connect(function(err) {
+connection.connect(function(err, res) {
 
     // error catcher
     if (err) throw err;
 
-    console.log("\nConnected to database BAMAZON on thread " + connection.threadId);
+    // console.log(res);
+
+    console.log("\nConnected to database BAMAZON on thread " + connection.config);
 
     // call display cars function 
     displayProducts();
 
     // terminate sql connection
-    // terminateConnection();
+    terminateConnection();
 });
 
 // FUNCTIONS TO QUERY SQL DATABASE
@@ -64,6 +68,16 @@ var displayProducts = function() {
     })
 }
 
+// function to update sql database in the product sales column
+// var updateProductsSales = function() {
+
+//     // SQL Query
+//     let sqlQuery = 
+// }
+
+// FUNCTION TO RUN APP
+// ===============================================================
+
 // function to prompt user what they would like to buy
 var promptCustomer = function() {
 
@@ -89,7 +103,7 @@ var promptCustomer = function() {
 
             // var to hold buying price
             let buyingPriceTotal = res[0].PRICE;
-            
+
             // if else to check if stock available
             if (customerResponse.buyingQuanity < res[0].STOCK_QUANITY) { // fulfill order
 
@@ -104,12 +118,14 @@ var promptCustomer = function() {
 
                     // provide customer with order details
                     console.log("\nThank you, your order has been submitted successfuly. \n\nYour total that will be billed is: $", buyingPriceTotal * customerResponse.buyingQuanity);
+
+                    // run function to update product sales in products table
+                    // updateProductsSales();
                 })
 
                 // terminate the sql connection
                 terminateConnection();
-            }
-            else { 
+            } else {
 
                 // cancel order
                 console.log("Sorry, there is an insufficient quantity of that vehicle in stock right now, please try again at a later time, or select another vehicle to purchase.");
