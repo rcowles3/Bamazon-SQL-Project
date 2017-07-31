@@ -1,13 +1,15 @@
 'use-strict'
 
+// ===============================================================
 // DECLARING VARIABLES TO USE FOR NODE PACKAGES
 // ===============================================================
 
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const env = require('dotenv').config();
+const Table = require('cli-table');
 
-
+// ===============================================================
 // CONNECTING TO SQL DB
 // ===============================================================
 
@@ -27,15 +29,41 @@ connection.connect(function(err, res) {
 
     // console.log(res);
 
-    console.log("\nConnected to database BAMAZON on thread " + connection.config);
+    console.log("\nConnected to database BAMAZON on thread " + connection.threadId, '\n');
 
     // call display cars function 
     displayProducts();
 
     // terminate sql connection
-    terminateConnection();
+    // terminateConnection();
 });
 
+// ===============================================================
+// SETTING UP OR NODE CLI TABLE
+// ===============================================================
+
+var table = new Table({
+    head: ['INVENTORY ID', 'CAR', 'PRICE'],
+    chars: {
+        'top': '═',
+        'top-mid': '╤',
+        'top-left': '╔',
+        'top-right': '╗',
+        'bottom': '═',
+        'bottom-mid': '╧',
+        'bottom-left': '╚',
+        'bottom-right': '╝',
+        'left': '║',
+        'left-mid': '╟',
+        'mid': '─',
+        'mid-mid': '┼',
+        'right': '║',
+        'right-mid': '╢',
+        'middle': '│'
+    }
+});
+
+// ===============================================================
 // FUNCTIONS TO QUERY SQL DATABASE
 // ===============================================================
 
@@ -51,17 +79,17 @@ var displayProducts = function() {
         // error catcher
         if (err) throw err;
 
-        console.log("\n-------------------------------------------------------------------------");
-        console.log("| Here is a list of all of the cars available at our Bamazon storefront.|");
-        console.log("-------------------------------------------------------------------------\n");
-
         // for loop to run through our data array
         for (let i = 0; i < res.length; i++) {
 
-            // render data to log
-            console.log("ID:", res[i].ITEM_ID, "\nCAR:", res[i].PRODUCT_NAME, "\nPRICE: $", res[i].PRICE);
-            console.log("\n------------------------------\n");
+            // pushing our results to our table array
+            table.push(
+                [res[i].ITEM_ID, res[i].PRODUCT_NAME, res[i].PRICE]
+            );
         }
+
+        // sending our data to the console
+        console.log(table.toString());
 
         // prompt user about purchases
         promptCustomer();
@@ -75,6 +103,7 @@ var displayProducts = function() {
 //     let sqlQuery = 
 // }
 
+// ===============================================================
 // FUNCTION TO RUN APP
 // ===============================================================
 
@@ -84,11 +113,11 @@ var promptCustomer = function() {
     // prompt user what they would like to purchase
     inquirer.prompt([{
         name: "buyingID",
-        message: "What is the ID of the vehicle that you would like to purchase?",
+        message: "\nWhat is the ID of the vehicle that you would like to purchase?",
         type: "input",
     }, {
         name: "buyingQuanity",
-        message: "How many vehicles would you like to purchase?",
+        message: "\nHow many vehicles would you like to purchase?",
         type: "input"
     }]).then(function(customerResponse) {
 
