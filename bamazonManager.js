@@ -1,13 +1,15 @@
 'use-strict'
 
+// ===============================================================
 // DECLARING VARIABLES TO USE FOR NODE PACKAGES
 // ===============================================================
 
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const env = require('dotenv').config();
+const Table = require('cli-table');
 
-
+// ===============================================================
 // CONNECTING TO SQL DB
 // ===============================================================
 
@@ -34,11 +36,37 @@ connection.connect(function(err) {
     // terminateConnection();
 });
 
+// ===============================================================
 // FUNCTIONS TO QUERY SQL DATABASE
 // ===============================================================
 
 // function to display all cars that are currently for sale
 var veiwProducts = function() {
+
+    // ===============================================================
+    // SETTING UP OR NODE CLI TABLE
+    // ===============================================================
+
+    let table = new Table({
+        head: ['INVENTORY ID', 'CAR', 'PRICE'],
+        chars: {
+            'top': '═',
+            'top-mid': '╤',
+            'top-left': '╔',
+            'top-right': '╗',
+            'bottom': '═',
+            'bottom-mid': '╧',
+            'bottom-left': '╚',
+            'bottom-right': '╝',
+            'left': '║',
+            'left-mid': '╟',
+            'mid': '─',
+            'mid-mid': '┼',
+            'right': '║',
+            'right-mid': '╢',
+            'middle': '│'
+        }
+    });
 
     // var to hold our SQL query
     let sqlQuery = "SELECT ITEM_ID, PRODUCT_NAME, PRICE FROM PRODUCTS";
@@ -49,24 +77,49 @@ var veiwProducts = function() {
         // error catcher
         if (err) throw err;
 
-        console.log("\n-------------------------------------------------------------------------");
-        console.log("| Here is a list of all of the cars available at our Bamazon storefront.|");
-        console.log("-------------------------------------------------------------------------\n");
-
         // for loop to run through our data array
         for (let i = 0; i < res.length; i++) {
 
-            // render data to log
-            console.log("ID:", res[i].ITEM_ID, "\nCAR:", res[i].PRODUCT_NAME, "\nPRICE: $", res[i].PRICE);
-            console.log("\n------------------------------\n");
+            // pushing our results to our table array
+            table.push(
+                [res[i].ITEM_ID, res[i].PRODUCT_NAME, res[i].PRICE]
+            );
         }
-    })
 
-    // terminate sql connection
-    terminateConnection();
+        // sending our data to the console
+        console.log(table.toString());
+
+        // prompt user about purchases
+        promptManager();
+    })
 }
 
 var lowInventory = function() {
+
+    // ===============================================================
+    // SETTING UP OR NODE CLI TABLE
+    // ===============================================================
+
+    let table = new Table({
+        head: ['INVENTORY ID', 'CAR', 'STOCK QUANTITY'],
+        chars: {
+            'top': '═',
+            'top-mid': '╤',
+            'top-left': '╔',
+            'top-right': '╗',
+            'bottom': '═',
+            'bottom-mid': '╧',
+            'bottom-left': '╚',
+            'bottom-right': '╝',
+            'left': '║',
+            'left-mid': '╟',
+            'mid': '─',
+            'mid-mid': '┼',
+            'right': '║',
+            'right-mid': '╢',
+            'middle': '│'
+        }
+    });
 
     // var to hold our sql query
     let sqlQuery = "SELECT ITEM_ID, PRODUCT_NAME, STOCK_QUANITY FROM PRODUCTS WHERE STOCK_QUANITY < 5";
@@ -79,21 +132,28 @@ var lowInventory = function() {
         // checking if null
         if (res === null) {
 
+            // table.push('\nEverything is sufficiently stocked.');
             console.log("\nEverything is sufficiently stocked.");
         } else {
-
-            console.log("\nWe are running low on these specific vehicles, an order for a new shipment should be placed.");
+            // table.push('\nWe are running low on these specific vehicles, an order for a new shipment should be placed.')
+            console.log("\n\nWe are running low on these specific vehicles, an order for a new shipment should be placed.\n");
 
             // for loop to run through low inventory
             for (let i = 0; i < res.length; i++) {
 
-                console.log("\nItem ID: ", res[i].ITEM_ID, "\nVehicle Name: ", res[i].PRODUCT_NAME, "\nIn Stock: ", res[i].STOCK_QUANITY, "\n------------------------------");
+                // sending our data to our table array
+                table.push(
+                    [res[i].ITEM_ID, res[i].PRODUCT_NAME, res[i].STOCK_QUANITY]
+                )
             }
-        }
-    })
 
-    // quit application
-    terminateConnection();
+            // logging data to cli
+            console.log(table.toString());
+
+        }
+        // prompt manager on what to do next
+        promptManager();
+    })
 }
 
 // function to update inventory
@@ -124,13 +184,38 @@ var updateInventory = function() {
             console.log("\nItem ID: ", updateItemId.updateID, " has successfuly been updated by ", updateItemId.updateQuantity, ".");
         })
 
-        // quit application
-        terminateConnection();
+        // prompt manager on what to do next
+        promptManager();
     })
 }
 
 // function to add new products 
 var addProduct = function() {
+
+    // ===============================================================
+    // SETTING UP OR NODE CLI TABLE
+    // ===============================================================
+
+    var table = new Table({
+        head: ['INVENTORY ID', 'PRODUCT NAME', 'DEPARTMENT', 'PRICE', 'STOCK QUANTITY'],
+        chars: {
+            'top': '═',
+            'top-mid': '╤',
+            'top-left': '╔',
+            'top-right': '╗',
+            'bottom': '═',
+            'bottom-mid': '╧',
+            'bottom-left': '╚',
+            'bottom-right': '╝',
+            'left': '║',
+            'left-mid': '╟',
+            'mid': '─',
+            'mid-mid': '┼',
+            'right': '║',
+            'right-mid': '╢',
+            'middle': '│'
+        }
+    });
 
     // prompt to ask manager what product to add
     inquirer.prompt([{
@@ -154,18 +239,18 @@ var addProduct = function() {
         message: "STOCK_QUANTITY: ",
         type: "input"
 
-    }]).then(function(addedProduct) {
+    }]).then(function(addedProduct) { // promise function
 
-        console.log("\nHere is the product data you wish to add: \nITEM_ID: ",
-            addedProduct.addItemId,
-            "\nPRODUCT_NAME: ",
+        // pushing data to table array
+        table.push([addedProduct.addItemId,
             addedProduct.addProductName,
-            "\nDEPARTMENT_NAME: ",
             addedProduct.addDepartmentName,
-            "\nPRICE: $",
             addedProduct.addPrice,
-            "\nSTOCK_QUANTITY: ",
-            addedProduct.addStockQuantity, "\n");
+            addedProduct.addStockQuantity
+        ]);
+
+        // sending our data to the cli
+        console.log(table.toString());
 
         // prompt to confirm data
         inquirer.prompt([{
@@ -195,8 +280,8 @@ var addProduct = function() {
                         console.log("\nYour data input has successfuly been updated in our database for ITEM_ID", addedProduct.addItemId);
                     })
 
-                // quit application
-                terminateConnection();
+                // prompt manager for what to do next
+                promptManager();
 
             } else {
 
@@ -207,6 +292,7 @@ var addProduct = function() {
     })
 }
 
+// ===============================================================
 // FUNCTION TO RUN APP
 // ===============================================================
 
